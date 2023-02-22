@@ -4,14 +4,35 @@ import com.example.handlingformsubmission.dto.Result;
 import com.example.handlingformsubmission.dto.Test;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class GatherVariable {
-    private Result[] results = new Result[10];
+    private List<Test> askedQuestion;
+    private final Result[] results = new Result[10];
     private int iForResult;
     private Test test1;
     private int numberOfTry = 1;
     private int iForlevel = 4;
     private int breaking;
+    private boolean checkResult;
+
+    public List<Test> getAskedQuestion() {
+        return askedQuestion;
+    }
+
+    public void setAskedQuestion(Test test1) {
+        if (test1 != null)
+            this.askedQuestion.add(test1);
+    }
+
+    public boolean isCheckResult() {
+        return checkResult;
+    }
+
+    public void setCheckResult(boolean checkResult) {
+        this.checkResult = checkResult;
+    }
 
     public Result[] getResults() {
         return results;

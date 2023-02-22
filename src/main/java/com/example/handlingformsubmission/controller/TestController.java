@@ -29,14 +29,13 @@ public class TestController {
         this.gatherVariable = gatherVariable;
     }
 
-    //todo убрать бизнес в сервисы
+    //todo убрать бизнес логику в сервисы
     //todo спрашивать имя у студента
 
     @GetMapping("")
     public String showQuestion(Model model) throws IOException {
-        TestReader test = new TestReader();
-        List<Test> askedQuestions = new ArrayList<>();
-        listOfQuestionsAndAnswers.setTests(test.fileReading("C:\\Users\\User\\IdeaProjects\\handling-form-submission\\" +
+        TestReader testReader = new TestReader();
+        listOfQuestionsAndAnswers.setTests(testReader.fileReading("C:\\Users\\User\\IdeaProjects\\handling-form-submission\\" +
                 "handling-form-submission\\src\\main\\resources\\static\\inputTen1.json"));
 
         //toDo исправить обработку ошибки если файл не будет найден
@@ -45,14 +44,14 @@ public class TestController {
         int level = 10;
 
         if (gatherVariable.getBreaking() != level) {
-            gatherVariable.setTest1(listOfQuestionsAndAnswers.getCurrentQuestion(listOfQuestionsAndAnswers.getTests(), askedQuestions, gatherVariable.getiForlevel()));
+            gatherVariable.setTest1(listOfQuestionsAndAnswers.getCurrentQuestion(listOfQuestionsAndAnswers.getTests(), gatherVariable.getAskedQuestion(), gatherVariable.getiForlevel()));
             model.addAttribute("showQuestion", gatherVariable.getTest1().getText() +
                     " " + Arrays.toString(gatherVariable.getTest1().getAnswer()));
-            askedQuestions.add(gatherVariable.getTest1());
+            gatherVariable.setAskedQuestion((gatherVariable.getTest1()));
 
             model.addAttribute("test", new Answer());
 
-            gatherVariable.setBreaking(gatherVariable.getBreaking()+1);
+            gatherVariable.setBreaking(gatherVariable.getBreaking() + 1);
 
         } else {
             return "testExit";
@@ -62,17 +61,20 @@ public class TestController {
 
     @PostMapping("")
     public String getAnswer(@ModelAttribute Answer answer, Model model) throws IOException {
-        boolean check = answer.equals(gatherVariable.getTest1().getTrueAnswer());
-        gatherVariable.setNumberOfTry(listOfQuestionsAndAnswers.nextIForNumberOfTry(check, gatherVariable.getNumberOfTry()));
-        gatherVariable.setiForlevel(listOfQuestionsAndAnswers.nextIForLevel(check, gatherVariable.getNumberOfTry(), gatherVariable.getiForlevel()));
+        gatherVariable.setCheckResult(answer.equals(gatherVariable.getTest1().getTrueAnswer()));
+        gatherVariable.setNumberOfTry(listOfQuestionsAndAnswers.nextIForNumberOfTry
+                (gatherVariable.isCheckResult(), gatherVariable.getNumberOfTry()));
+        gatherVariable.setiForlevel(listOfQuestionsAndAnswers.nextIForLevel
+                (gatherVariable.isCheckResult(), gatherVariable.getNumberOfTry(), gatherVariable.getiForlevel()));
 
         model.addAttribute("answer", answer);
 
-        model.addAttribute("check", check);
+        model.addAttribute("check", gatherVariable.isCheckResult());
 
-        gatherVariable.setResults(listOfQuestionsAndAnswers.saveResult(check, gatherVariable.getTest1(), answer));
+        gatherVariable.setResults(listOfQuestionsAndAnswers.saveResult
+                (gatherVariable.isCheckResult(), gatherVariable.getTest1(), answer));
 
-        gatherVariable.setiForResult(gatherVariable.getiForResult()+1);
+        gatherVariable.setiForResult(gatherVariable.getiForResult() + 1);
 
         ObjectMapper objectMapper = new ObjectMapper();
         String jsonTestResult = objectMapper.writeValueAsString(gatherVariable.getResults());
