@@ -1,0 +1,19 @@
+<!DOCTYPE HTML>
+<html xmlns:th="https://www.thymeleaf.org">
+<head>
+    <title>Test</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+</head>
+<body>
+<form th:method="post" th:action="@{/test}" th:object="${test}">
+    <label for="text">Question 1: </label>
+    <p th:text="${showQuestion}">VALUE</p>
+    <input type="text" th:field="*{text}" id="text"/>
+    <input type="submit" value="Send"/>
+</form>
+</body>
+</html>
+
+<!--    <div th:each="showAnswer : ${showQuestion}">-->
+<!--        <a  th:text="${showAnswer}"></a>-->
+<!--    </div>-->
