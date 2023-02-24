@@ -1,9 +1,7 @@
 package com.example.handlingformsubmission.controller;
 
 import com.example.handlingformsubmission.GatherVariable;
-import com.example.handlingformsubmission.ListOfQuestionsAndAnswers;
 import com.example.handlingformsubmission.dto.*;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,19 +11,17 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 @Controller
 @RequestMapping("/test")
 public class TestController {
-    private final ListOfQuestionsAndAnswers listOfQuestionsAndAnswers;
-    private GatherVariable gatherVariable;
+    private final GatherVariable gatherVariable;
+    private Test test;
 
     @Autowired
-    public TestController(ListOfQuestionsAndAnswers listOfQuestionsAndAnswers, GatherVariable gatherVariable) {
-        this.listOfQuestionsAndAnswers = listOfQuestionsAndAnswers;
+    public TestController(GatherVariable gatherVariable, Test test) {
+        this.test = test;
         this.gatherVariable = gatherVariable;
     }
 
@@ -34,20 +30,17 @@ public class TestController {
 
     @GetMapping("")
     public String showQuestion(Model model) throws IOException {
-        TestReader testReader = new TestReader();
-        listOfQuestionsAndAnswers.setTests(testReader.fileReading("C:\\Users\\User\\IdeaProjects\\handling-form-submission\\" +
-                "handling-form-submission\\src\\main\\resources\\static\\inputTen1.json"));
-
         //toDo исправить обработку ошибки если файл не будет найден
         //todo хендлер для обработки ошибок
 
         int level = 10;
 
         if (gatherVariable.getBreaking() != level) {
-            gatherVariable.setTest1(listOfQuestionsAndAnswers.getCurrentQuestion(listOfQuestionsAndAnswers.getTests(), gatherVariable.getAskedQuestion(), gatherVariable.getiForlevel()));
-            model.addAttribute("showQuestion", gatherVariable.getTest1().getText() +
-                    " " + Arrays.toString(gatherVariable.getTest1().getAnswer()));
-            gatherVariable.setAskedQuestion((gatherVariable.getTest1()));
+            test = gatherVariable.getCurrentTestQuestion();
+            model.addAttribute("showQuestion", test.getText() +
+                    " " + Arrays.toString(test.getAnswer()));
+
+            gatherVariable.setAskedQuestion(test);
 
             model.addAttribute("test", new Answer());
 
@@ -61,26 +54,23 @@ public class TestController {
 
     @PostMapping("")
     public String getAnswer(@ModelAttribute Answer answer, Model model) throws IOException {
-        gatherVariable.setCheckResult(answer.equals(gatherVariable.getTest1().getTrueAnswer()));
-        gatherVariable.setNumberOfTry(listOfQuestionsAndAnswers.nextIForNumberOfTry
-                (gatherVariable.isCheckResult(), gatherVariable.getNumberOfTry()));
-        gatherVariable.setiForlevel(listOfQuestionsAndAnswers.nextIForLevel
+        gatherVariable.setCheckResult(answer.equals(test.getTrueAnswer()));
+        gatherVariable.setiForlevel(gatherVariable.nextIForLevel
                 (gatherVariable.isCheckResult(), gatherVariable.getNumberOfTry(), gatherVariable.getiForlevel()));
+        gatherVariable.setNumberOfTry(gatherVariable.nextIForNumberOfTry
+                (gatherVariable.isCheckResult(), gatherVariable.getNumberOfTry()));
+
 
         model.addAttribute("answer", answer);
 
         model.addAttribute("check", gatherVariable.isCheckResult());
 
-        gatherVariable.setResults(listOfQuestionsAndAnswers.saveResult
-                (gatherVariable.isCheckResult(), gatherVariable.getTest1(), answer));
+        gatherVariable.setResults(gatherVariable.saveResult
+                (gatherVariable.isCheckResult(), test, answer));
 
         gatherVariable.setiForResult(gatherVariable.getiForResult() + 1);
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        String jsonTestResult = objectMapper.writeValueAsString(gatherVariable.getResults());
-        FileWriter fileWriter = new FileWriter();
-        String path = "C:\\Users\\User\\IdeaProjects\\handling-form-submission\\handling-form-submission\\src\\main\\resources\\static\\results.json";
-        fileWriter.writingFile(path, jsonTestResult);
+        gatherVariable.toFileWriter(gatherVariable);
 
         return "redirect:/test";
     }

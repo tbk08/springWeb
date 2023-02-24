@@ -44,6 +44,7 @@ public abstract class MainLevelExamination {
                 notAskedQuestions.add(questions[iForLevel][j]);
             }
         }
+//        System.out.println("not asked"+askedQuestions.toString());
         int ran = (int) (Math.random() * notAskedQuestions.size());
         return notAskedQuestions.get(ran);
     }

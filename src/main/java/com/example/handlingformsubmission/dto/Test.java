@@ -2,6 +2,8 @@ package com.example.handlingformsubmission.dto;
 
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
+
 @Component
 public class Test {
 
@@ -38,5 +40,15 @@ public class Test {
     }
 
     public Test() {
+    }
+
+    @Override
+    public String toString() {
+        return "Test{" +
+                "text='" + text + '\'' +
+                ", level=" + level +
+                ", answer=" + Arrays.toString(answer) +
+                ", trueAnswer=" + trueAnswer +
+                '}';
     }
 }

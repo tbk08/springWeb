@@ -6,14 +6,10 @@
 </head>
 <body>
 <form th:method="post" th:action="@{/test}" th:object="${test}">
-    <label for="text">Question 1: </label>
-    <p th:text="${showQuestion}">VALUE</p>
+    <label for="text"><p th:text="${showQuestion}">VALUE</p> </label>
+<!--    <p th:text="${showQuestion}">VALUE</p>-->
     <input type="text" th:field="*{text}" id="text"/>
     <input type="submit" value="Send"/>
 </form>
 </body>
 </html>
-
-<!--    <div th:each="showAnswer : ${showQuestion}">-->
-<!--        <a  th:text="${showAnswer}"></a>-->
-<!--    </div>-->
